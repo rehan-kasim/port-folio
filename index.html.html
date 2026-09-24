@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Projects and notes by Rehan Kasim">
+  <title>Rehan Kasim</title>
+
+  <style>
+    :root {
+      --paper: #f5f2ea;
+      --ink: #20201e;
+      --quiet-ink: #66645f;
+      --rule: #d8d3c7;
+      --purple-pen: #6748d9;
+      --project-paper: #fffdf8;
+      --soft-purple: #eae4ff;
+    }
+
+    body[data-colour="night"] {
+      --paper: #151518;
+      --ink: #eeeeea;
+      --quiet-ink: #aaa7a0;
+      --rule: #34343a;
+      --purple-pen: #aa96ff;
+      --project-paper: #1d1d22;
+      --soft-purple: #2b2544;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 17px/1.65 Arial, Helvetica, sans-serif;
+      transition: background 180ms ease, color 180ms ease;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .notebook {
+      width: min(920px, calc(100% - 42px));
+      margin: 0 auto;
+    }
+
+    .top-strip {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--rule);
+      background: color-mix(in srgb, var(--paper) 91%, transparent);
+      backdrop-filter: blur(12px);
+    }
+
+    .top-strip .notebook {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .my-name {
+      margin-right: auto;
+      color: var(--ink);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      text-decoration: none;
+    }
+
+    .top-strip nav {
+      display: flex;
+      gap: 20px;
+    }
+
+    .top-strip nav a {
+      color: var(--quiet-ink);
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .top-strip nav a:hover,
+    .top-strip nav a[aria-current="true"] {
+      color: var(--purple-pen);
+    }
+
+    #colour-switch {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border: 1px solid var(--rule);
+      border-radius: 50%;
+      background: var(--project-paper);
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .opening-page {
+      min-height: 78vh;
+      padding: 90px 0 70px;
+      display: grid;
+      align-content: center;
+    }
+
+    .tiny-line {
+      margin: 0 0 14px;
+      color: var(--purple-pen);
+      font-family: Consolas, monospace;
+      font-size: 14px;
+    }
+
+    h1 {
+      max-width: 800px;
+      margin: 0;
+      font-size: clamp(48px, 9vw, 88px);
+      line-height: 0.96;
+      letter-spacing: -0.065em;
+    }
+
+    .opening-page > p:last-of-type {
+      max-width: 630px;
+      margin: 28px 0;
+      color: var(--quiet-ink);
+      font-size: 20px;
+    }
+
+    .opening-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 11px;
+    }
+
+    .opening-links a,
+    .email-button {
+      padding: 10px 17px;
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+      background: var(--project-paper);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .opening-links .filled-link {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .portfolio-section {
+      padding: 82px 0;
+      border-top: 1px solid var(--rule);
+    }
+
+    .section-intro {
+      display: grid;
+      grid-template-columns: 165px 1fr;
+      gap: 35px;
+      margin-bottom: 34px;
+    }
+
+    h2 {
+      margin: 4px 0 0;
+      color: var(--purple-pen);
+      font: 500 14px/1.4 Consolas, monospace;
+    }
+
+    .section-intro p {
+      max-width: 680px;
+      margin: 0;
+      font-size: clamp(28px, 5vw, 43px);
+      line-height: 1.12;
+      letter-spacing: -0.04em;
+    }
+
+    .about-writing {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 34px;
+      color: var(--quiet-ink);
+    }
+
+    .about-writing p {
+      margin: 0;
+    }
+
+    .things-i-am-learning {
+      margin-top: 30px;
+      padding: 20px 22px;
+      border-left: 3px solid var(--purple-pen);
+      background: var(--project-paper);
+    }
+
+    .things-i-am-learning strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .things-i-am-learning span {
+      color: var(--quiet-ink);
+    }
+
+    .hackathon-notes {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .hackathon-notes li {
+      display: grid;
+      grid-template-columns: 55px 1fr auto;
+      gap: 18px;
+      align-items: center;
+      padding: 19px 4px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .hackathon-count {
+      color: var(--quiet-ink);
+      font: 13px Consolas, monospace;
+    }
+
+    .hackathon-notes strong {
+      display: block;
+    }
+
+    .hackathon-notes small {
+      color: var(--quiet-ink);
+    }
+
+    .purple-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--purple-pen);
+    }
+
+    .result-note {
+      margin: 28px 0 0;
+      color: var(--quiet-ink);
+    }
+
+    .result-note strong {
+      color: var(--ink);
+    }
+
+    .project-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .rehan-project {
+      min-height: 250px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--rule);
+      border-radius: 17px;
+      background: var(--project-paper);
+      color: var(--ink);
+      text-decoration: none;
+      transition: transform 160ms ease, border-color 160ms ease;
+    }
+
+    .rehan-project:hover {
+      border-color: var(--purple-pen);
+      transform: translateY(-3px);
+    }
+
+    .project-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .project-heading h3 {
+      margin: 0;
+      font-size: 23px;
+      letter-spacing: -0.03em;
+    }
+
+    .project-heading span {
+      color: var(--purple-pen);
+      font-size: 22px;
+    }
+
+    .rehan-project p {
+      margin: 15px 0 25px;
+      color: var(--quiet-ink);
+      font-size: 15px;
+    }
+
+    .rehan-project code {
+      margin-top: auto;
+      color: var(--purple-pen);
+      font-size: 12px;
+    }
+
+    .more-projects {
+      grid-column: 1 / -1;
+      min-height: auto;
+    }
+
+    .contact-paper {
+      padding: 35px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 25px;
+      border-radius: 20px;
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .contact-paper h2 {
+      color: var(--paper);
+    }
+
+    .contact-paper p {
+      margin: 7px 0 0;
+      opacity: 0.72;
+    }
+
+    .email-button {
+      border-color: var(--paper);
+      background: var(--paper);
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    footer {
+      padding: 38px 0 58px;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      color: var(--quiet-ink);
+      font-size: 13px;
+    }
+
+    .entering {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+
+    .entered {
+      opacity: 1;
+      transform: none;
+      transition: opacity 450ms ease, transform 450ms ease;
+    }
+
+    @media (max-width: 700px) {
+      .top-strip nav {
+        display: none;
+      }
+
+      .opening-page {
+        min-height: 72vh;
+      }
+
+      .section-intro,
+      .about-writing,
+      .project-list {
+        grid-template-columns: 1fr;
+      }
+
+      .more-projects {
+        grid-column: auto;
+      }
+
+      .contact-paper,
+      footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .entering,
+      .entered {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="top-strip">
+    <div class="notebook">
+      <a class="my-name" href="#start">Rehan Kasim</a>
+
+      <nav aria-label="Portfolio sections">
+        <a href="#about">About</a>
+        <a href="#hackathons">Hackathons</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <button id="colour-switch" type="button" aria-label="Change colour theme">◐</button>
+    </div>
+  </header>
+
+  <main class="notebook" id="start">
+    <section class="opening-page entering">
+      <p class="tiny-line">Hello I am Rehan</p>
+      <h1>I build things because I want to know how they work</h1>
+      <p>
+        I started coding when I was 12. Now I build websites browsers programming
+        languages and experiments with AI. A lot of my projects begin with me
+        wondering if I can make something myself.
+      </p>
+
+      <div class="opening-links">
+        <a class="filled-link" href="#projects">See my projects</a>
+        <a href="https://github.com/rehan-kasim" target="_blank" rel="noreferrer">My GitHub</a>
+      </div>
+    </section>
+
+    <section class="portfolio-section entering" id="about">
+      <div class="section-intro">
+        <h2>About me</h2>
+        <p>I usually choose a project first and learn the difficult parts while making it</p>
+      </div>
+
+      <div class="about-writing">
+        <p>
+          I am 15 and I have been coding for around a year. I began with web
+          development and Python. After that I became more interested in what is
+          happening below the browser and below the programming language.
+        </p>
+
+        <p>
+          I do not finish every idea and some projects break a lot before they work.
+          I still keep building because every attempt teaches me something I would
+          not learn by only watching another course.
+        </p>
+      </div>
+
+      <div class="things-i-am-learning">
+        <strong>What I am learning now</strong>
+        <span>C C++ Rust AI and ML operating systems compilers CPU architecture cybersecurity and game development</span>
+      </div>
+    </section>
+
+    <section class="portfolio-section entering" id="hackathons">
+      <div class="section-intro">
+        <h2>Hackathons</h2>
+        <p>Three places where I had to stop planning forever and actually ship something</p>
+      </div>
+
+      <ol class="hackathon-notes">
+        <li>
+          <span class="hackathon-count">01</span>
+          <div><strong>Aaroh</strong><small>IIIT Delhi</small></div>
+          <span class="purple-dot" aria-hidden="true"></span>
+        </li>
+        <li>
+          <span class="hackathon-count">02</span>
+          <div><strong>Takumi</strong><small>DOE</small></div>
+          <span class="purple-dot" aria-hidden="true"></span>
+        </li>
+        <li>
+          <span class="hackathon-count">03</span>
+          <div><strong>HackSideDown</strong><small>Hack Club</small></div>
+          <span class="purple-dot" aria-hidden="true"></span>
+        </li>
+      </ol>
+
+      <p class="result-note"><strong>Top 10</strong> in a Hack Club event</p>
+    </section>
+
+    <section class="portfolio-section entering" id="projects">
+      <div class="section-intro">
+        <h2>Projects</h2>
+        <p>The larger ideas I kept returning to instead of leaving them as another folder</p>
+      </div>
+
+      <div class="project-list">
+        <a class="rehan-project" href="https://github.com/rehan-kasim/OpenFlash" target="_blank" rel="noreferrer">
+          <div class="project-heading"><h3>OpenFlash</h3><span>↗</span></div>
+          <p>
+            My attempt to bring the idea of Adobe Flash into the modern web with
+            tools for animations games and interactive projects.
+          </p>
+          <code>React TypeScript Canvas</code>
+        </a>
+
+        <a class="rehan-project" href="https://github.com/rehan-kasim/Hyperion-Browser" target="_blank" rel="noreferrer">
+          <div class="project-heading"><h3>Hyperion Browser</h3><span>↗</span></div>
+          <p>
+            A browser experiment made because I wanted to understand what happens
+            behind a tab instead of treating the browser like magic.
+          </p>
+          <code>C++ browser engine</code>
+        </a>
+
+        <a class="rehan-project" href="https://github.com/rehan-kasim" target="_blank" rel="noreferrer">
+          <div class="project-heading"><h3>Arion</h3><span>↗</span></div>
+          <p>
+            A programming language experiment where I am learning about compilers
+            assembly performance and self hosting.
+          </p>
+          <code>Rust Assembly Compilers</code>
+        </a>
+
+        <a class="rehan-project" href="https://github.com/rehan-kasim" target="_blank" rel="noreferrer">
+          <div class="project-heading"><h3>Orion AI</h3><span>↗</span></div>
+          <p>
+            An AI operating system idea for Windows and an experiment in fitting AI
+            into normal computer work.
+          </p>
+          <code>Python AI</code>
+        </a>
+
+        <a class="rehan-project" href="https://github.com/rehan-kasim" target="_blank" rel="noreferrer">
+          <div class="project-heading"><h3>Count</h3><span>↗</span></div>
+          <p>
+            A file tool based on a simple question. Why should opening different
+            file formats always require finding another app.
+          </p>
+          <code>File tools experiment</code>
+        </a>
+
+        <a class="rehan-project more-projects" href="https://github.com/rehan-kasim" target="_blank" rel="noreferrer">
+          <div class="project-heading"><h3>The smaller projects</h3><span>↗</span></div>
+          <p>
+            Games websites AI tests half working ideas and the experiments that
+            taught me something even when they never became a large project.
+          </p>
+          <code>Everything is on my GitHub</code>
+        </a>
+      </div>
+    </section>
+
+    <section class="portfolio-section entering" id="contact">
+      <div class="contact-paper">
+        <div>
+          <h2>Contact</h2>
+          <p>If you want to build something or talk about computers send me a message</p>
+        </div>
+        <a class="email-button" href="mailto:rehankasim771@gmail.com">Email me</a>
+      </div>
+    </section>
+
+    <footer>
+      <span>Made by Rehan Kasim</span>
+      <a href="https://github.com/rehan-kasim" target="_blank" rel="noreferrer">GitHub</a>
+    </footer>
+  </main>
+
+  <script>
+    const colourButton = document.querySelector("#colour-switch");
+    const pageParts = document.querySelectorAll(".entering");
+    const menuItems = document.querySelectorAll(".top-strip nav a");
+
+    function readColourChoice() {
+      try {
+        return localStorage.getItem("rehans-portfolio-colour");
+      } catch (storageError) {
+        return null;
+      }
+    }
+
+    function saveColourChoice(colour) {
+      try {
+        localStorage.setItem("rehans-portfolio-colour", colour);
+      } catch (storageError) {
+        console.info("The colour choice will only last for this visit");
+      }
+    }
+
+    const savedColour = readColourChoice();
+    const computerPrefersNight = window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    if (savedColour === "night" || (!savedColour && computerPrefersNight)) {
+      document.body.dataset.colour = "night";
+    }
+
+    colourButton.addEventListener("click", function () {
+      const nightIsOn = document.body.dataset.colour === "night";
+      const nextColour = nightIsOn ? "day" : "night";
+
+      document.body.dataset.colour = nextColour;
+      saveColourChoice(nextColour);
+    });
+
+    function showPartsAlreadyOnScreen() {
+      pageParts.forEach(function (part) {
+        const partTop = part.getBoundingClientRect().top;
+        const partIsClose = partTop < window.innerHeight - 70;
+
+        if (partIsClose) {
+          part.classList.add("entered");
+        }
+      });
+    }
+
+    function markNearestSection() {
+      let nearestId = "";
+      let nearestDistance = Number.POSITIVE_INFINITY;
+
+      document.querySelectorAll("main section[id]").forEach(function (section) {
+        const distance = Math.abs(section.getBoundingClientRect().top - 110);
+
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestId = section.id;
+        }
+      });
+
+      menuItems.forEach(function (item) {
+        item.setAttribute(
+          "aria-current",
+          item.getAttribute("href") === "#" + nearestId ? "true" : "false"
+        );
+      });
+    }
+
+    let scrollWorkIsWaiting = false;
+
+    window.addEventListener("scroll", function () {
+      if (scrollWorkIsWaiting) return;
+
+      scrollWorkIsWaiting = true;
+
+      window.requestAnimationFrame(function () {
+        showPartsAlreadyOnScreen();
+        markNearestSection();
+        scrollWorkIsWaiting = false;
+      });
+    }, { passive: true });
+
+    window.addEventListener("pageshow", function () {
+      showPartsAlreadyOnScreen();
+      markNearestSection();
+    });
+  </script>
+</body>
+</html>
