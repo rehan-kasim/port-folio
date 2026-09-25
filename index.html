@@ -3,30 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Projects and notes by Rehan Kasim">
+  <meta name="theme-color" content="#050607">
+  <meta
+    name="description"
+    content="Rehan Kasim's interactive flashlight portfolio"
+  >
   <title>Rehan Kasim</title>
+
   <style>
-    :root {
-      --paper: #f5f2ea;
-      --ink: #20201e;
-      --quiet-ink: #66645f;
-      --rule: #d8d3c7;
-      --purple-pen: #6748d9;
-      --project-paper: #fffdf8;
-      --soft-purple: #eae4ff;
-    }
-
-    body[data-colour="night"] {
-      --paper: #151518;
-      --ink: #eeeeea;
-      --quiet-ink: #aaa7a0;
-      --rule: #34343a;
-      --purple-pen: #aa96ff;
-      --project-paper: #1d1d22;
-      --soft-purple: #2b2544;
-    }
-
-    * {
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
     }
 
@@ -36,354 +23,462 @@
 
     body {
       margin: 0;
-      background: var(--paper);
-      color: var(--ink);
-      font: 17px/1.65 Arial, Helvetica, sans-serif;
-      transition: background 180ms ease, color 180ms ease;
+      background: #050607;
+      color: #ecece7;
+      font: 16px/1.6 Arial, sans-serif;
+      cursor: none;
     }
 
+    button,
     a {
       color: inherit;
-    }
-
-    button {
       font: inherit;
     }
 
-    .notebook {
-      width: min(920px, calc(100% - 42px));
-      margin: 0 auto;
+    button:focus-visible,
+    a:focus-visible {
+      outline: 2px solid #71f6b5;
+      outline-offset: 3px;
     }
 
-    .top-strip {
-      position: sticky;
+    .world {
+      min-height: 100vh;
+      background:
+        linear-gradient(
+          rgba(255, 255, 255, 0.018) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.018) 1px,
+          transparent 1px
+        ),
+        #07090a;
+      background-size: 44px 44px;
+    }
+
+    .darkness {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
+      background: rgba(0, 0, 0, 0.97);
+      -webkit-mask: radial-gradient(
+        circle var(--size, 180px)
+        at var(--x, 50vw) var(--y, 50vh),
+        transparent 38%,
+        rgba(0, 0, 0, 0.2) 62%,
+        #000 100%
+      );
+      mask: radial-gradient(
+        circle var(--size, 180px)
+        at var(--x, 50vw) var(--y, 50vh),
+        transparent 38%,
+        rgba(0, 0, 0, 0.2) 62%,
+        #000 100%
+      );
+    }
+
+    body.off .darkness {
+      -webkit-mask: none;
+      mask: none;
+    }
+
+    body.uv .darkness {
+      background: rgba(8, 0, 20, 0.95);
+    }
+
+    .torch {
+      position: fixed;
       top: 0;
-      z-index: 10;
-      border-bottom: 1px solid var(--rule);
-      background: color-mix(in srgb, var(--paper) 91%, transparent);
-      backdrop-filter: blur(12px);
+      left: 0;
+      z-index: 120;
+      width: 46px;
+      height: 24px;
+      pointer-events: none;
+      filter: drop-shadow(0 3px 4px #000);
+      transform: translate(-10px, -12px) rotate(-28deg);
     }
 
-    .top-strip .notebook {
-      min-height: 64px;
+    .torch::before {
+      position: absolute;
+      top: 7px;
+      left: 0;
+      width: 30px;
+      height: 12px;
+      border: 1px solid #d8ddd9;
+      border-radius: 4px 8px 8px 4px;
+      background: linear-gradient(#5a6060, #202526 58%, #101314);
+      content: "";
+    }
+
+    .torch::after {
+      position: absolute;
+      top: 4px;
+      left: 27px;
+      width: 16px;
+      height: 18px;
+      border: 1px solid #e5e9e5;
+      border-radius: 3px 9px 9px 3px;
+      background: linear-gradient(90deg, #3b4141 35%, #effff7 38%);
+      box-shadow: 8px 0 18px rgba(113, 246, 181, 0.7);
+      content: "";
+    }
+
+    body.off .torch::after {
+      background: #666;
+      box-shadow: none;
+    }
+
+    body.uv .torch::after {
+      background: #b99cff;
+      box-shadow: 8px 0 18px #b99cff;
+    }
+
+    .dock {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 30;
       display: flex;
+      gap: 14px;
       align-items: center;
-      gap: 24px;
+      min-height: 62px;
+      padding: 10px 18px;
+      border-bottom: 1px solid #292d2f;
+      background: rgba(5, 6, 7, 0.93);
     }
 
-    .my-name {
+    .name {
       margin-right: auto;
-      color: var(--ink);
-      font-weight: 800;
-      letter-spacing: -0.04em;
+      font: bold 14px Consolas, monospace;
       text-decoration: none;
     }
 
-    .top-strip nav {
+    .name span,
+    .counter span {
+      color: #71f6b5;
+    }
+
+    .battery {
+      width: 130px;
+    }
+
+    .battery-text {
       display: flex;
-      gap: 20px;
+      justify-content: space-between;
+      color: #aaa;
+      font: 11px Consolas, monospace;
     }
 
-    .top-strip nav a {
-      color: var(--quiet-ink);
-      font-size: 14px;
-      text-decoration: none;
+    .battery-track {
+      height: 7px;
+      margin-top: 5px;
+      overflow: hidden;
+      border: 1px solid #555;
+      border-radius: 8px;
     }
 
-    .top-strip nav a:hover,
-    .top-strip nav a[aria-current="true"] {
-      color: var(--purple-pen);
+    .battery-fill {
+      width: 100%;
+      height: 100%;
+      background: #71f6b5;
     }
 
-    #colour-switch {
-      width: 38px;
-      height: 38px;
-      padding: 0;
-      border: 1px solid var(--rule);
-      border-radius: 50%;
-      background: var(--project-paper);
-      color: var(--ink);
-      cursor: pointer;
+    .dock button {
+      height: 36px;
+      border: 1px solid #363b3d;
+      border-radius: 7px;
+      background: #111416;
+      cursor: none;
     }
 
-    .opening-page {
-      min-height: 78vh;
-      padding: 90px 0 70px;
+    .counter {
+      position: fixed;
+      top: 76px;
+      right: 16px;
+      z-index: 30;
+      padding: 8px 10px;
+      border: 1px solid #292e30;
+      border-radius: 7px;
+      background: #090b0c;
+      font: 11px Consolas, monospace;
+    }
+
+    main {
+      width: min(1000px, calc(100% - 36px));
+      margin: auto;
+      padding: 110px 0 120px;
+    }
+
+    .hello {
       display: grid;
       align-content: center;
+      min-height: 72vh;
     }
 
-    .tiny-line {
-      margin: 0 0 14px;
-      color: var(--purple-pen);
-      font-family: Consolas, monospace;
-      font-size: 14px;
+    .small {
+      color: #71f6b5;
+      font: 13px Consolas, monospace;
     }
 
     h1 {
       max-width: 800px;
-      margin: 0;
-      font-size: clamp(48px, 9vw, 88px);
-      line-height: 0.96;
-      letter-spacing: -0.065em;
+      margin: 10px 0 0;
+      font-size: clamp(46px, 9vw, 90px);
+      line-height: 0.95;
+      letter-spacing: -0.07em;
     }
 
-    .opening-page > p:last-of-type {
-      max-width: 630px;
-      margin: 28px 0;
-      color: var(--quiet-ink);
-      font-size: 20px;
+    .intro {
+      max-width: 650px;
+      color: #989b98;
+      font-size: 19px;
     }
 
-    .opening-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 11px;
+    .part {
+      padding: 80px 0;
+      border-top: 1px solid #252a2d;
     }
 
-    .opening-links a,
-    .email-button {
-      padding: 10px 17px;
-      border: 1px solid var(--rule);
-      border-radius: 999px;
-      background: var(--project-paper);
-      color: var(--ink);
-      font-size: 14px;
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .opening-links .filled-link {
-      border-color: var(--ink);
-      background: var(--ink);
-      color: var(--paper);
-    }
-
-    .portfolio-section {
-      padding: 82px 0;
-      border-top: 1px solid var(--rule);
-    }
-
-    .section-intro {
+    .part-title {
       display: grid;
-      grid-template-columns: 165px 1fr;
-      gap: 35px;
-      margin-bottom: 34px;
+      grid-template-columns: 160px 1fr;
+      gap: 28px;
+      margin-bottom: 30px;
     }
 
-    h2 {
-      margin: 4px 0 0;
-      color: var(--purple-pen);
-      font: 500 14px/1.4 Consolas, monospace;
-    }
-
-    .section-intro p {
-      max-width: 680px;
-      margin: 0;
-      font-size: clamp(28px, 5vw, 43px);
-      line-height: 1.12;
-      letter-spacing: -0.04em;
-    }
-
-    .about-writing {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 34px;
-      color: var(--quiet-ink);
-    }
-
-    .about-writing p {
-      margin: 0;
-    }
-
-    .things-i-am-learning {
-      margin-top: 30px;
-      padding: 20px 22px;
-      border-left: 3px solid var(--purple-pen);
-      background: var(--project-paper);
-    }
-
-    .things-i-am-learning strong {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .things-i-am-learning span {
-      color: var(--quiet-ink);
-    }
-
-    .hackathon-notes {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .hackathon-notes li {
-      display: grid;
-      grid-template-columns: 55px 1fr auto;
-      gap: 18px;
-      align-items: center;
-      padding: 19px 4px;
-      border-bottom: 1px solid var(--rule);
-    }
-
-    .hackathon-count {
-      color: var(--quiet-ink);
+    .part-title h2 {
+      margin: 4px 0;
+      color: #71f6b5;
       font: 13px Consolas, monospace;
     }
 
-    .hackathon-notes strong {
-      display: block;
+    .part-title p {
+      margin: 0;
+      font-size: clamp(27px, 5vw, 43px);
+      line-height: 1.12;
     }
 
-    .hackathon-notes small {
-      color: var(--quiet-ink);
-    }
-
-    .purple-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--purple-pen);
-    }
-
-    .result-note {
-      margin: 28px 0 0;
-      color: var(--quiet-ink);
-    }
-
-    .result-note strong {
-      color: var(--ink);
-    }
-
-    .project-list {
+    .about,
+    .things {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .about {
+      color: #999;
+    }
+
+    .things {
       gap: 14px;
     }
 
-    .rehan-project {
-      min-height: 250px;
-      padding: 24px;
+    .thing {
+      position: relative;
       display: flex;
       flex-direction: column;
-      border: 1px solid var(--rule);
-      border-radius: 17px;
-      background: var(--project-paper);
-      color: var(--ink);
+      min-height: 245px;
+      padding: 23px;
+      border: 1px solid #292e30;
+      border-radius: 14px;
+      background: #0d1011;
       text-decoration: none;
-      transition: transform 160ms ease, border-color 160ms ease;
     }
 
-    .rehan-project:hover {
-      border-color: var(--purple-pen);
-      transform: translateY(-3px);
+    .thing:hover,
+    .thing.found {
+      border-color: #71f6b5;
     }
 
-    .project-heading {
-      display: flex;
-      justify-content: space-between;
-      gap: 15px;
-    }
-
-    .project-heading h3 {
+    .thing h3 {
       margin: 0;
       font-size: 23px;
-      letter-spacing: -0.03em;
     }
 
-    .project-heading span {
-      color: var(--purple-pen);
-      font-size: 22px;
+    .thing p {
+      color: #929592;
     }
 
-    .rehan-project p {
-      margin: 15px 0 25px;
-      color: var(--quiet-ink);
-      font-size: 15px;
-    }
-
-    .rehan-project code {
+    .thing code {
       margin-top: auto;
-      color: var(--purple-pen);
-      font-size: 12px;
+      color: #71f6b5;
     }
 
-    .more-projects {
-      grid-column: 1 / -1;
-      min-height: auto;
+    .status {
+      position: absolute;
+      right: 13px;
+      bottom: 10px;
+      color: #666;
+      font: 10px Consolas, monospace;
     }
 
-    .contact-paper {
-      padding: 35px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 25px;
-      border-radius: 20px;
-      background: var(--ink);
-      color: var(--paper);
+    .thing.found .status {
+      color: #71f6b5;
     }
 
-    .contact-paper h2 {
-      color: var(--paper);
+    .uv-note {
+      display: none;
+      color: #b99cff;
+      font: 12px Consolas, monospace;
     }
 
-    .contact-paper p {
-      margin: 7px 0 0;
-      opacity: 0.72;
+    body.uv .thing p,
+    body.uv .thing code {
+      display: none;
     }
 
-    .email-button {
-      border-color: var(--paper);
-      background: var(--paper);
-      color: var(--ink);
-      white-space: nowrap;
+    body.uv .uv-note {
+      display: block;
     }
 
-    footer {
-      padding: 38px 0 58px;
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      color: var(--quiet-ink);
-      font-size: 13px;
+    .events {
+      padding: 0;
+      list-style: none;
     }
 
-    .entering {
+    .events li {
+      padding: 16px 4px;
+      border-bottom: 1px solid #252a2d;
+    }
+
+    .events small {
+      margin-left: 10px;
+      color: #999;
+    }
+
+    .contact {
+      padding: 30px;
+      border: 1px solid #292e30;
+      border-radius: 14px;
+      background: #0d1011;
+    }
+
+    .contact a {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 9px 14px;
+      border-radius: 7px;
+      background: #71f6b5;
+      color: #07100c;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .boot {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background: #050607;
+      transition:
+        opacity 0.5s,
+        visibility 0.5s;
+    }
+
+    .boot.hide {
+      visibility: hidden;
       opacity: 0;
-      transform: translateY(14px);
     }
 
-    .entered {
-      opacity: 1;
-      transform: none;
-      transition: opacity 450ms ease, transform 450ms ease;
+    .boot-card {
+      width: min(600px, 100%);
+      padding: 32px;
+      border: 1px solid #292f31;
+      border-radius: 17px;
+      background: #0b0e0f;
+    }
+
+    .boot-card h2 {
+      margin: 0;
+      font-size: clamp(34px, 7vw, 55px);
+      line-height: 1;
+    }
+
+    .boot-card > p {
+      color: #969a97;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+    }
+
+    .control {
+      padding: 14px;
+      border: 1px solid #252b2d;
+      border-radius: 10px;
+      background: #101415;
+    }
+
+    .key {
+      display: inline-block;
+      padding: 3px 8px;
+      border: 1px solid #46504b;
+      border-radius: 5px;
+      color: #71f6b5;
+      font: 12px Consolas, monospace;
+    }
+
+    .control strong,
+    .control small {
+      display: block;
+    }
+
+    .control small {
+      color: #777;
+    }
+
+    .load-track {
+      height: 4px;
+      margin-top: 24px;
+      background: #202526;
+    }
+
+    .load-fill {
+      width: 0;
+      height: 100%;
+      background: #71f6b5;
+    }
+
+    .loading-text {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 9px;
+      color: #777;
+      font: 11px Consolas, monospace;
     }
 
     @media (max-width: 700px) {
-      .top-strip nav {
+      body {
+        cursor: auto;
+      }
+
+      .torch {
         display: none;
       }
 
-      .opening-page {
-        min-height: 72vh;
-      }
-
-      .section-intro,
-      .about-writing,
-      .project-list {
+      .things,
+      .about,
+      .part-title,
+      .controls {
         grid-template-columns: 1fr;
       }
 
-      .more-projects {
-        grid-column: auto;
+      .battery {
+        width: 90px;
       }
 
-      .contact-paper,
-      footer {
-        align-items: flex-start;
-        flex-direction: column;
+      .dock {
+        gap: 8px;
+      }
+
+      .dock button {
+        padding: 0 8px;
+        cursor: pointer;
       }
     }
 
@@ -392,10 +487,7 @@
         scroll-behavior: auto;
       }
 
-      .entering,
-      .entered {
-        opacity: 1;
-        transform: none;
+      .boot {
         transition: none;
       }
     }
@@ -403,256 +495,604 @@
 </head>
 
 <body>
-  <header class="top-strip">
-    <div class="notebook">
-      <a class="my-name" href="#start">Rehan Kasim</a>
+  <div
+    class="boot"
+    id="boot"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="boot-title"
+  >
+    <div class="boot-card">
+      <h2 id="boot-title">How to use this site</h2>
 
-      <nav aria-label="Portfolio sections">
-        <a href="#about">About</a>
-        <a href="#hackathons">Hackathons</a>
-        <a href="#projects">Projects</a>
-        <a href="#contact">Contact</a>
-      </nav>
+      <p>Move the flashlight around to find my projects.</p>
 
-      <button id="colour-switch" type="button" aria-label="Change colour theme">◐</button>
-    </div>
-  </header>
-
-  <main class="notebook" id="start">
-    <section class="opening-page entering">
-      <p class="tiny-line">Hello I am Rehan</p>
-      <h1>I build things because I want to know how they work</h1>
-      <p>
-        I started coding when I was 12. Now I build websites browsers programming
-        languages and experiments with AI. A lot of my projects begin with me
-        wondering if I can make something myself.
-      </p>
-
-      <div class="opening-links">
-        <a class="filled-link" href="#projects">See my projects</a>
-        <a href="https://github.com/rehan-kasim" target="_blank" rel="noreferrer">My GitHub</a>
-      </div>
-    </section>
-
-    <section class="portfolio-section entering" id="about">
-      <div class="section-intro">
-        <h2>About me</h2>
-        <p>I usually choose a project first and learn the difficult parts while making it</p>
-      </div>
-
-      <div class="about-writing">
-        <p>
-          I am 15 and I have been coding for around a year. I began with web
-          development and Python. After that I became more interested in what is
-          happening below the browser and below the programming language.
-        </p>
-
-        <p>
-          I do not finish every idea and some projects break a lot before they work.
-          I still keep building because every attempt teaches me something I would
-          not learn by only watching another course.
-        </p>
-      </div>
-
-      <div class="things-i-am-learning">
-        <strong>What I am learning now</strong>
-        <span>C C++ Rust AI and ML operating systems compilers CPU architecture cybersecurity and game development</span>
-      </div>
-    </section>
-
-    <section class="portfolio-section entering" id="hackathons">
-      <div class="section-intro">
-        <h2>Hackathons</h2>
-        <p>Three places where I had to stop planning forever and actually ship something</p>
-      </div>
-
-      <ol class="hackathon-notes">
-        <li>
-          <span class="hackathon-count">01</span>
-          <div><strong>Aaroh</strong><small>IIIT Delhi</small></div>
-          <span class="purple-dot" aria-hidden="true"></span>
-        </li>
-        <li>
-          <span class="hackathon-count">02</span>
-          <div><strong>Takumi</strong><small>DOE</small></div>
-          <span class="purple-dot" aria-hidden="true"></span>
-        </li>
-        <li>
-          <span class="hackathon-count">03</span>
-          <div><strong>HackSideDown</strong><small>Hack Club</small></div>
-          <span class="purple-dot" aria-hidden="true"></span>
-        </li>
-      </ol>
-
-      <p class="result-note"><strong>Top 10</strong> in a Hack Club event</p>
-    </section>
-
-    <section class="portfolio-section entering" id="projects">
-      <div class="section-intro">
-        <h2>Projects</h2>
-        <p>The larger ideas I kept returning to instead of leaving them as another folder</p>
-      </div>
-
-      <div class="project-list">
-        <a class="rehan-project" href="https://github.com/rehan-kasim/OpenFlash" target="_blank" rel="noreferrer">
-          <div class="project-heading"><h3>OpenFlash</h3><span>↗</span></div>
-          <p>
-            My attempt to bring the idea of Adobe Flash into the modern web with
-            tools for animations games and interactive projects.
-          </p>
-          <code>React TypeScript Canvas</code>
-        </a>
-
-        <a class="rehan-project" href="https://github.com/rehan-kasim/Hyperion-Browser" target="_blank" rel="noreferrer">
-          <div class="project-heading"><h3>Hyperion Browser</h3><span>↗</span></div>
-          <p>
-            A browser experiment made because I wanted to understand what happens
-            behind a tab instead of treating the browser like magic.
-          </p>
-          <code>C++ browser engine</code>
-        </a>
-
-        <a class="rehan-project" href="https://github.com/rehan-kasim" target="_blank" rel="noreferrer">
-          <div class="project-heading"><h3>Arion</h3><span>↗</span></div>
-          <p>
-            A programming language experiment where I am learning about compilers
-            assembly performance and self hosting.
-          </p>
-          <code>Rust Assembly Compilers</code>
-        </a>
-
-        <a class="rehan-project" href="https://github.com/rehan-kasim" target="_blank" rel="noreferrer">
-          <div class="project-heading"><h3>Orion AI</h3><span>↗</span></div>
-          <p>
-            An AI operating system idea for Windows and an experiment in fitting AI
-            into normal computer work.
-          </p>
-          <code>Python AI</code>
-        </a>
-
-        <a class="rehan-project" href="https://github.com/rehan-kasim" target="_blank" rel="noreferrer">
-          <div class="project-heading"><h3>Count</h3><span>↗</span></div>
-          <p>
-            A file tool based on a simple question. Why should opening different
-            file formats always require finding another app.
-          </p>
-          <code>File tools experiment</code>
-        </a>
-
-        <a class="rehan-project more-projects" href="https://github.com/rehan-kasim" target="_blank" rel="noreferrer">
-          <div class="project-heading"><h3>The smaller projects</h3><span>↗</span></div>
-          <p>
-            Games websites AI tests half working ideas and the experiments that
-            taught me something even when they never became a large project.
-          </p>
-          <code>Everything is on my GitHub</code>
-        </a>
-      </div>
-    </section>
-
-    <section class="portfolio-section entering" id="contact">
-      <div class="contact-paper">
-        <div>
-          <h2>Contact</h2>
-          <p>If you want to build something or talk about computers send me a message</p>
+      <div class="controls">
+        <div class="control">
+          <span class="key">MOVE</span>
+          <strong>Move the light</strong>
+          <small>Mouse or touch</small>
         </div>
-        <a class="email-button" href="mailto:rehankasim771@gmail.com">Email me</a>
-      </div>
-    </section>
 
-    <footer>
-      <span>Made by Rehan Kasim</span>
-      <a href="https://github.com/rehan-kasim" target="_blank" rel="noreferrer">GitHub</a>
-    </footer>
-  </main>
+        <div class="control">
+          <span class="key">F</span>
+          <strong>Flashlight</strong>
+          <small>Turn it off to charge</small>
+        </div>
+
+        <div class="control">
+          <span class="key">U</span>
+          <strong>UV light</strong>
+          <small>Find hidden notes</small>
+        </div>
+      </div>
+
+      <div class="load-track">
+        <div class="load-fill" id="loading-line"></div>
+      </div>
+
+      <div class="loading-text">
+        <span>LOADING</span>
+        <span id="countdown">5</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="torch" id="torch" aria-hidden="true"></div>
+  <div class="darkness" aria-hidden="true"></div>
+
+  <div class="world">
+    <header class="dock">
+      #top
+        REHAN<span>.LIGHT</span>
+      </a>
+
+      <div class="battery">
+        <div class="battery-text">
+          <span>BATTERY</span>
+          <span id="battery-number">100%</span>
+        </div>
+
+        <div
+          class="battery-track"
+          role="progressbar"
+          aria-label="Flashlight battery"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="100"
+        >
+          <div class="battery-fill" id="battery-fill"></div>
+        </div>
+      </div>
+
+      <button
+        id="light-button"
+        type="button"
+        aria-pressed="true"
+      >
+        LIGHT
+      </button>
+
+      <button
+        id="uv-button"
+        type="button"
+        aria-pressed="false"
+      >
+        UV
+      </button>
+    </header>
+
+    <div class="counter" aria-live="polite">
+      PROJECTS <span id="found">0</span> / 6
+    </div>
+
+    <main id="top">
+      <section class="hello">
+        <p class="small">HI, I AM REHAN</p>
+
+        <h1>
+          I build random things to learn how they work
+        </h1>
+
+        <p class="intro">
+          I started coding when I was 12. I mostly build websites,
+          browsers, programming languages, and AI experiments.
+          Move the flashlight around to see some of my projects.
+        </p>
+      </section>
+
+      <section
+        class="part"
+        aria-labelledby="about-title"
+      >
+        <div class="part-title">
+          <h2 id="about-title">ABOUT</h2>
+          <p>I like finding out how things work</p>
+        </div>
+
+        <div class="about">
+          <p>
+            I started with websites and Python. Now I am learning
+            C, C++, Rust, compilers, operating systems, and AI.
+          </p>
+
+          <p>
+            Most projects start with a random idea. I try building
+            it and learn from whatever blocks me.
+          </p>
+        </div>
+      </section>
+
+      <section
+        class="part"
+        aria-labelledby="projects-title"
+      >
+        <div class="part-title">
+          <h2 id="projects-title">PROJECTS</h2>
+          <p>Hold the light on a project</p>
+        </div>
+
+        <div class="things">
+          <a
+            class="thing"
+            data-name="openflash"
+            href="https://github.com/rehan-kasim/OpenFlash"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <h3>OpenFlash</h3>
+
+            <p>
+              My take on the old Flash idea for making games,
+              animations, and interactive projects.
+            </p>
+
+            <span class="uv-note">
+              Old browser games were fun. I wanted that feeling back.
+            </span>
+
+            <code>React · TypeScript · Canvas</code>
+            <span class="status">NOT FOUND</span>
+          </a>
+
+          <a
+            class="thing"
+            data-name="hyperion"
+            href="https://github.com/rehan-kasim/Hyperion-Browser"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <h3>Hyperion Browser</h3>
+
+            <p>
+              A browser I started because I wanted to know what
+              really happens inside a tab.
+            </p>
+
+            <span class="uv-note">
+              One Chrome tab made my laptop lag, so I tried making
+              my own browser.
+            </span>
+
+            <code>C++</code>
+            <span class="status">NOT FOUND</span>
+          </a>
+
+          <a
+            class="thing"
+            data-name="arion"
+            href="https://github.com/rehan-kasim"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <h3>Arion</h3>
+
+            <p>
+              My programming-language experiment. This is where I
+              learn about compilers and assembly.
+            </p>
+
+            <span class="uv-note">
+              The idea was probably too big: make something faster
+              than C.
+            </span>
+
+            <code>Rust · Assembly</code>
+            <span class="status">NOT FOUND</span>
+          </a>
+
+          <a
+            class="thing"
+            data-name="orion"
+            href="https://github.com/rehan-kasim"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <h3>Orion AI</h3>
+
+            <p>
+              An idea for putting AI into normal Windows tasks
+              instead of another chat page.
+            </p>
+
+            <span class="uv-note">
+              I wanted the computer to help directly.
+            </span>
+
+            <code>Python · AI</code>
+            <span class="status">NOT FOUND</span>
+          </a>
+
+          <a
+            class="thing"
+            data-name="count"
+            href="https://github.com/rehan-kasim"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <h3>Count</h3>
+
+            <p>
+              A small tool for opening different file types without
+              hunting for another app.
+            </p>
+
+            <span class="uv-note">
+              Opening one file should not need three different apps.
+            </span>
+
+            <code>File tools</code>
+            <span class="status">NOT FOUND</span>
+          </a>
+
+          <a
+            class="thing"
+            data-name="more"
+            href="https://github.com/rehan-kasim"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <h3>More projects</h3>
+
+            <p>
+              I also build smaller experiments and keep them on
+              GitHub.
+            </p>
+
+            <span class="uv-note">
+              A few broken projects taught me the most.
+            </span>
+
+            <code>GitHub</code>
+            <span class="status">NOT FOUND</span>
+          </a>
+        </div>
+      </section>
+
+      <section
+        class="part"
+        aria-labelledby="hackathons-title"
+      >
+        <div class="part-title">
+          <h2 id="hackathons-title">HACKATHONS</h2>
+          <p>Three hackathons I took part in</p>
+        </div>
+
+        <ul class="events">
+          <li>
+            Aaroh
+            <small>IIIT Delhi</small>
+          </li>
+
+          <li>
+            Takumi
+            <small>DOE</small>
+          </li>
+
+          <li>
+            HackSideDown
+            <small>Hack Club</small>
+          </li>
+        </ul>
+      </section>
+
+      <section class="part">
+        <div class="contact">
+          <strong>THAT IS EVERYTHING</strong>
+
+          <p>
+            Want to build something or talk about computers?
+            Send me a message.
+          </p>
+
+          <a href="mailto:rehankasim771@gmail.com">
+            Email me
+          </a>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <script>
-    const colourButton = document.querySelector("#colour-switch");
-    const pageParts = document.querySelectorAll(".entering");
-    const menuItems = document.querySelectorAll(".top-strip nav a");
+    const root = document.documentElement;
+    const torch = document.querySelector("#torch");
+    const lightButton = document.querySelector("#light-button");
+    const uvButton = document.querySelector("#uv-button");
+    const cards = [...document.querySelectorAll(".thing")];
+    const batteryFill = document.querySelector("#battery-fill");
+    const batteryNumber = document.querySelector("#battery-number");
+    const batteryTrack = document.querySelector(".battery-track");
+    const foundNumber = document.querySelector("#found");
 
-    function readColourChoice() {
-      try {
-        return localStorage.getItem("rehans-portfolio-colour");
-      } catch (storageError) {
-        return null;
+    let lightOn = true;
+    let uvOn = false;
+
+    let charge = Number(
+      localStorage.getItem("rehan-battery") ?? 100
+    );
+
+    let pointerX = window.innerWidth / 2;
+    let pointerY = window.innerHeight / 2;
+    let lightX = pointerX;
+    let lightY = pointerY;
+    let lastFrame = performance.now();
+
+    let foundProjects = (
+      localStorage.getItem("rehan-projects") ?? ""
+    )
+      .split("|")
+      .filter(Boolean);
+
+    const hoverTimes = Object.create(null);
+
+    if (!Number.isFinite(charge)) {
+      charge = 100;
+    }
+
+    charge = Math.max(0, Math.min(100, charge));
+
+    function refreshFoundCount() {
+      const total = cards.filter((card) =>
+        card.classList.contains("found")
+      ).length;
+
+      foundNumber.textContent = total;
+    }
+
+    function saveProgress() {
+      foundProjects = cards
+        .filter((card) => card.classList.contains("found"))
+        .map((card) => card.dataset.name);
+
+      localStorage.setItem(
+        "rehan-projects",
+        foundProjects.join("|")
+      );
+
+      localStorage.setItem(
+        "rehan-battery",
+        String(Math.round(charge))
+      );
+    }
+
+    function setUv(enabled) {
+      uvOn = Boolean(enabled && lightOn);
+
+      document.body.classList.toggle("uv", uvOn);
+      uvButton.textContent = uvOn ? "UV ON" : "UV";
+      uvButton.setAttribute("aria-pressed", String(uvOn));
+    }
+
+    function setLight(enabled) {
+      lightOn = Boolean(enabled && charge > 0);
+
+      document.body.classList.toggle("off", !lightOn);
+      lightButton.textContent = lightOn ? "LIGHT" : "OFF";
+      lightButton.setAttribute(
+        "aria-pressed",
+        String(lightOn)
+      );
+
+      if (!lightOn) {
+        setUv(false);
       }
     }
 
-    function saveColourChoice(colour) {
-      try {
-        localStorage.setItem("rehans-portfolio-colour", colour);
-      } catch (storageError) {
-        console.info("The colour choice will only last for this visit");
+    function revealCards(seconds) {
+      if (!lightOn) {
+        return;
       }
-    }
 
-    const savedColour = readColourChoice();
-    const computerPrefersNight = window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-    if (savedColour === "night" || (!savedColour && computerPrefersNight)) {
-      document.body.dataset.colour = "night";
-    }
-
-    colourButton.addEventListener("click", function () {
-      const nightIsOn = document.body.dataset.colour === "night";
-      const nextColour = nightIsOn ? "day" : "night";
-
-      document.body.dataset.colour = nextColour;
-      saveColourChoice(nextColour);
-    });
-
-    function showPartsAlreadyOnScreen() {
-      pageParts.forEach(function (part) {
-        const partTop = part.getBoundingClientRect().top;
-        const partIsClose = partTop < window.innerHeight - 70;
-
-        if (partIsClose) {
-          part.classList.add("entered");
+      for (const card of cards) {
+        if (card.classList.contains("found")) {
+          continue;
         }
-      });
-    }
 
-    function markNearestSection() {
-      let nearestId = "";
-      let nearestDistance = Number.POSITIVE_INFINITY;
+        const box = card.getBoundingClientRect();
 
-      document.querySelectorAll("main section[id]").forEach(function (section) {
-        const distance = Math.abs(section.getBoundingClientRect().top - 110);
-
-        if (distance < nearestDistance) {
-          nearestDistance = distance;
-          nearestId = section.id;
-        }
-      });
-
-      menuItems.forEach(function (item) {
-        item.setAttribute(
-          "aria-current",
-          item.getAttribute("href") === "#" + nearestId ? "true" : "false"
+        const closestX = Math.max(
+          box.left,
+          Math.min(lightX, box.right)
         );
-      });
+
+        const closestY = Math.max(
+          box.top,
+          Math.min(lightY, box.bottom)
+        );
+
+        const isLit =
+          Math.hypot(
+            lightX - closestX,
+            lightY - closestY
+          ) < 82;
+
+        const projectName = card.dataset.name;
+
+        hoverTimes[projectName] = isLit
+          ? (hoverTimes[projectName] ?? 0) + seconds
+          : 0;
+
+        if (hoverTimes[projectName] <= 0.7) {
+          continue;
+        }
+
+        card.classList.add("found");
+
+        const status = card.querySelector(".status");
+
+        if (status) {
+          status.textContent = "FOUND";
+        }
+
+        charge = Math.min(100, charge + 6);
+
+        refreshFoundCount();
+        saveProgress();
+      }
     }
 
-    let scrollWorkIsWaiting = false;
+    function animateLight(currentTime) {
+      const seconds = Math.min(
+        (currentTime - lastFrame) / 1000,
+        0.1
+      );
 
-    window.addEventListener("scroll", function () {
-      if (scrollWorkIsWaiting) return;
+      lastFrame = currentTime;
 
-      scrollWorkIsWaiting = true;
+      lightX += (pointerX - lightX) * 0.18;
+      lightY += (pointerY - lightY) * 0.18;
 
-      window.requestAnimationFrame(function () {
-        showPartsAlreadyOnScreen();
-        markNearestSection();
-        scrollWorkIsWaiting = false;
-      });
-    }, { passive: true });
+      root.style.setProperty("--x", `${lightX}px`);
+      root.style.setProperty("--y", `${lightY}px`);
 
-    window.addEventListener("pageshow", function () {
-      showPartsAlreadyOnScreen();
-      markNearestSection();
+      if (lightOn) {
+        charge -= seconds * (uvOn ? 1.5 : 0.65);
+      } else {
+        charge += seconds * 1.3;
+      }
+
+      charge = Math.max(0, Math.min(100, charge));
+
+      if (charge <= 0) {
+        setLight(false);
+      }
+
+      const roundedCharge = Math.round(charge);
+
+      batteryFill.style.width = `${charge}%`;
+
+      batteryFill.style.background =
+        charge < 20 ? "#ff6b6b" : "#71f6b5";
+
+      batteryNumber.textContent = `${roundedCharge}%`;
+
+      batteryTrack.setAttribute(
+        "aria-valuenow",
+        String(roundedCharge)
+      );
+
+      revealCards(seconds);
+      requestAnimationFrame(animateLight);
+    }
+
+    function showIntro() {
+      const line = document.querySelector("#loading-line");
+      const countdown = document.querySelector("#countdown");
+      const boot = document.querySelector("#boot");
+
+      let secondsLeft = 5;
+
+      line.style.transition = "width 5s linear";
+
+      setTimeout(() => {
+        line.style.width = "100%";
+      }, 30);
+
+      const clock = setInterval(() => {
+        secondsLeft -= 1;
+
+        countdown.textContent =
+          secondsLeft > 0
+            ? String(secondsLeft)
+            : "READY";
+
+        if (secondsLeft > 0) {
+          return;
+        }
+
+        clearInterval(clock);
+        boot.classList.add("hide");
+
+        setTimeout(() => {
+          boot.remove();
+        }, 600);
+      }, 1000);
+    }
+
+    cards.forEach((card) => {
+      if (!foundProjects.includes(card.dataset.name)) {
+        return;
+      }
+
+      card.classList.add("found");
+
+      const status = card.querySelector(".status");
+
+      if (status) {
+        status.textContent = "FOUND";
+      }
     });
+
+    window.addEventListener("pointermove", (event) => {
+      pointerX = event.clientX;
+      pointerY = event.clientY;
+
+      torch.style.left = `${event.clientX}px`;
+      torch.style.top = `${event.clientY}px`;
+    });
+
+    window.addEventListener(
+      "touchmove",
+      (event) => {
+        const touch = event.touches[0];
+
+        if (!touch) {
+          return;
+        }
+
+        pointerX = touch.clientX;
+        pointerY = touch.clientY;
+      },
+      {
+        passive: true
+      }
+    );
+
+    window.addEventListener("keydown", (event) => {
+      const key = event.key.toLowerCase();
+
+      if (key === "f") {
+        setLight(!lightOn);
+      }
+
+      if (key === "u") {
+        setUv(!uvOn);
+      }
+    });
+
+    lightButton.addEventListener("click", () => {
+      setLight(!lightOn);
+    });
+
+    uvButton.addEventListener("click", () => {
+      setUv(!uvOn);
+    });
+
+    window.addEventListener("pagehide", saveProgress);
+
+    refreshFoundCount();
+    showIntro();
+    requestAnimationFrame(animateLight);
   </script>
 </body>
 </html>
