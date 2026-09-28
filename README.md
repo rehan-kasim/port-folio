@@ -77,7 +77,7 @@ rehan-light
 └── LICENSE.md
 ```
 
-Replace `YOUR-REPOSITORY-NAME` with the actual name of the GitHub repository.
+Replace `port-folio` with the actual name of the GitHub repository.
 
 ## Executing the Program
 
